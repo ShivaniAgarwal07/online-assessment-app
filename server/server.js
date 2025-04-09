@@ -5,7 +5,6 @@ require('./models'); //to sync the modelsn
 const testRoutes= require('./routes/testRoutes');
 require('dotenv').config();
 
-const app= express();
 
 // app.use(cors());
 
