@@ -1,4 +1,4 @@
-const { Test } = require('../models');
+const { Test, Submission } = require('../models');
 
 const createTest = async (req, res) => {
   try {
@@ -16,12 +16,41 @@ const createTest = async (req, res) => {
   }
 };
 
-const getTest= async (req, res) => {
-    
-}
+
+const submitTest = async (req, res) => {
+    const { testId } = req.params;
+    const { candidateName, candidateEmail, answers } = req.body;
+  
+    try {
+      const test = await Test.findByPk(testId);
+      if (!test) return res.status(404).json({ message: 'Test not found' });
+  
+      const correctAnswers = test.questions.map(q => q.correctIndex);
+      let score = 0;
+  
+      answers.forEach((answer, i) => {
+        if (answer === correctAnswers[i]) score++;
+      });
+  
+      const submission = await Submission.create({
+        candidateName,
+        candidateEmail,
+        testId,
+        answers,
+        score,
+      });
+  
+      res.status(201).json({ message: 'Submission recorded', submission });
+    } catch (err) {
+      console.error('Submission error:', err);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  };
+
 
 module.exports = {
     createTest,
+    submitTest
 };
 
 
